@@ -1,0 +1,32 @@
+{
+  "name": "Chicken Point — Reposição de Estoque",
+  "short_name": "Chicken Point",
+  "description": "Lista de compras por categoria para reposição de estoque da Chicken Point",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#17140F",
+  "theme_color": "#17140F",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
