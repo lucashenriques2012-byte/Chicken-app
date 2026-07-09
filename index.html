@@ -13,381 +13,423 @@
 <link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="icon" href="icon-192.png" />
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+  @font-face {
+    font-family: 'Inter-fallback';
+    src: local('Arial');
+  }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #17140F; }
-  body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
   button { font-family: inherit; cursor: pointer; }
   input, select { font-family: inherit; }
   ::selection { background: #E3A62F55; }
   .cp-scroll::-webkit-scrollbar { display: none; }
-  #root { min-height: 100vh; }
+
+  .cp-page { min-height: 100vh; background: #17140F; display: flex; justify-content: center; padding: 0 0 24px; }
+  .cp-shell { width: 100%; max-width: 480px; min-height: 100vh; background: #1C1811; display: flex; flex-direction: column; }
+  .cp-header { display: flex; align-items: center; justify-content: space-between; padding: 24px 20px 16px; border-bottom: 1px solid #2C251B; }
+  .cp-eyebrow { font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 0.14em; color: #C1440E; font-weight: 600; margin-bottom: 2px; }
+  .cp-title { font-family: -apple-system, Arial, sans-serif; font-weight: 800; font-size: 30px; letter-spacing: 0.02em; color: #F5EFE3; margin: 0; line-height: 1; }
+  .cp-bell { width: 40px; height: 40px; border-radius: 10px; border: 1px solid #3A3226; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #2C251B; font-size: 18px; }
+  .cp-bell.on { background: #E3A62F; }
+
+  .cp-ticket { margin: 16px 20px 0; background: #221D16; border: 1px solid #3A3226; border-radius: 12px; overflow: hidden; }
+  .cp-ticket-header { width: 100%; background: transparent; border: none; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; color: #F5EFE3; }
+  .cp-ticket-left { font-family: 'Courier New', monospace; font-size: 12px; letter-spacing: 0.04em; display: flex; align-items: center; gap: 8px; color: #F5EFE3; }
+  .cp-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #E3A62F; }
+  .cp-dot.overdue { background: #C1440E; }
+  .cp-ticket-body { border-top: 1px dashed #3A3226; padding: 10px 14px 14px; }
+  .cp-reminder { font-family: 'Courier New', monospace; font-size: 12.5px; color: #E3A62F; background: #2C251B; border: 1px solid #3A3226; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; }
+  .cp-ticket-row { display: flex; align-items: baseline; gap: 8px; font-family: 'Courier New', monospace; font-size: 13px; color: #D8CDB8; padding: 4px 0; }
+  .cp-ticket-qty { color: #E3A62F; font-weight: 600; min-width: 26px; }
+  .cp-ticket-name { flex: 1; }
+  .cp-ticket-meta { color: #7A6E58; font-size: 11px; }
+
+  .cp-tabrow { display: flex; gap: 8px; padding: 16px 20px 4px; overflow-x: auto; }
+  .cp-tab { flex-shrink: 0; padding: 8px 14px; border-radius: 999px; border: 1px solid #3A3226; font-size: 13.5px; font-weight: 600; white-space: nowrap; background: transparent; color: #B5A990; }
+  .cp-tab.active { background: #E3A62F; color: #17140F; border-color: #E3A62F; }
+
+  .cp-list { flex: 1; padding: 8px 20px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .cp-empty { color: #7A6E58; font-size: 13.5px; padding: 24px 4px; line-height: 1.5; }
+  .cp-row { display: flex; align-items: center; gap: 10px; background: #221D16; border: 1px solid #2C251B; border-radius: 10px; padding: 10px 12px; min-height: 52px; }
+  .cp-row-name { flex: 1; color: #F5EFE3; font-size: 14.5px; font-weight: 500; }
+  .cp-qty-input { width: 52px; background: #17140F; border: 1px solid #3A3226; border-radius: 8px; color: #F5EFE3; font-family: 'Courier New', monospace; font-size: 14px; padding: 8px 6px; text-align: center; }
+  .cp-add-btn { width: 34px; height: 34px; border-radius: 8px; background: #E3A62F; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; color: #17140F; font-weight: 700; }
+  .cp-bought-btn { width: 34px; height: 34px; border-radius: 8px; background: #6B8F47; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; color: #17140F; font-weight: 700; }
+  .cp-stepper { display: flex; align-items: center; gap: 8px; background: #17140F; border: 1px solid #3A3226; border-radius: 8px; padding: 4px 8px; }
+  .cp-step-btn { background: transparent; border: none; color: #E3A62F; display: flex; align-items: center; justify-content: center; padding: 4px 6px; font-size: 18px; font-weight: 700; }
+  .cp-step-qty { font-family: 'Courier New', monospace; color: #F5EFE3; font-size: 14px; min-width: 18px; text-align: center; }
+  .cp-edit-input { flex: 1; background: #17140F; border: 1px solid #3A3226; border-radius: 8px; color: #F5EFE3; font-size: 14px; padding: 8px 10px; min-width: 0; }
+  .cp-danger-btn { width: 34px; height: 34px; border-radius: 8px; background: #3A2018; border: 1px solid #C1440E88; color: #C1440E; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+  .cp-new-row { display: flex; align-items: center; gap: 8px; background: #1C1811; border: 1px dashed #3A3226; border-radius: 10px; padding: 10px 12px; margin-top: 4px; }
+  .cp-select { background: #17140F; border: 1px solid #3A3226; border-radius: 8px; color: #F5EFE3; font-size: 13px; padding: 8px 6px; flex-shrink: 0; max-width: 108px; }
+  .cp-footer { padding: 8px 20px 20px; }
+  .cp-edit-toggle { width: 100%; border: none; border-radius: 10px; padding: 13px 0; font-size: 14px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; background: #2C251B; color: #B5A990; }
+  .cp-edit-toggle.active { background: #C1440E; color: #F5EFE3; }
+
+  #cp-load-fallback { color: #B5A990; font-family: Arial, sans-serif; font-size: 14px; padding: 40px 24px; text-align: center; line-height: 1.6; }
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root">
+  <div id="cp-load-fallback">Carregando o app da Chicken Point…</div>
+</div>
 
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script>
+(function () {
+  "use strict";
 
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useRef } = React;
+  var CATEGORIES = ["Frangos", "Porções", "Bebidas", "Mercado"];
+  var CAT_ICON = { "Frangos": "🐔", "Porções": "🍟", "Bebidas": "🥤", "Mercado": "🧂" };
 
-/* ---------------------------------------------------------
-   Chicken Point — Lista de Reposição
-   Paleta: fritura noturna (carvão), mostarda tostada, páprica
---------------------------------------------------------- */
+  var DEFAULT_CATALOG = [
+    { id: "c1", name: "Frango inteiro", category: "Frangos" },
+    { id: "c2", name: "Peito de frango", category: "Frangos" },
+    { id: "c3", name: "Coxa e sobrecoxa", category: "Frangos" },
+    { id: "c4", name: "Asinha de frango", category: "Frangos" },
+    { id: "c5", name: "Frango a passarinho", category: "Frangos" },
+    { id: "p1", name: "Batata frita", category: "Porções" },
+    { id: "p2", name: "Polenta frita", category: "Porções" },
+    { id: "p3", name: "Mandioca frita", category: "Porções" },
+    { id: "p4", name: "Onion rings", category: "Porções" },
+    { id: "p5", name: "Nuggets", category: "Porções" },
+    { id: "b1", name: "Coca-Cola lata", category: "Bebidas" },
+    { id: "b2", name: "Guaraná lata", category: "Bebidas" },
+    { id: "b3", name: "Suco de laranja", category: "Bebidas" },
+    { id: "b4", name: "Água mineral", category: "Bebidas" },
+    { id: "b5", name: "Cerveja long neck", category: "Bebidas" },
+    { id: "m1", name: "Óleo de soja", category: "Mercado" },
+    { id: "m2", name: "Sal", category: "Mercado" },
+    { id: "m3", name: "Embalagem descartável", category: "Mercado" },
+    { id: "m4", name: "Guardanapo", category: "Mercado" },
+    { id: "m5", name: "Sacola plástica", category: "Mercado" }
+  ];
 
-const CATEGORIES = ["Frangos", "Porções", "Bebidas", "Mercado"];
+  var STORAGE_KEY = "chicken-point-data";
+  var OVERDUE_MS = 20 * 60 * 60 * 1000;
+  var CHECK_INTERVAL_MS = 30 * 60 * 1000;
 
-const DEFAULT_CATALOG = [
-  { id: "c1", name: "Frango inteiro", category: "Frangos" },
-  { id: "c2", name: "Peito de frango", category: "Frangos" },
-  { id: "c3", name: "Coxa e sobrecoxa", category: "Frangos" },
-  { id: "c4", name: "Asinha de frango", category: "Frangos" },
-  { id: "c5", name: "Frango a passarinho", category: "Frangos" },
-  { id: "p1", name: "Batata frita", category: "Porções" },
-  { id: "p2", name: "Polenta frita", category: "Porções" },
-  { id: "p3", name: "Mandioca frita", category: "Porções" },
-  { id: "p4", name: "Onion rings", category: "Porções" },
-  { id: "p5", name: "Nuggets", category: "Porções" },
-  { id: "b1", name: "Coca-Cola lata", category: "Bebidas" },
-  { id: "b2", name: "Guaraná lata", category: "Bebidas" },
-  { id: "b3", name: "Suco de laranja", category: "Bebidas" },
-  { id: "b4", name: "Água mineral", category: "Bebidas" },
-  { id: "b5", name: "Cerveja long neck", category: "Bebidas" },
-  { id: "m1", name: "Óleo de soja", category: "Mercado" },
-  { id: "m2", name: "Sal", category: "Mercado" },
-  { id: "m3", name: "Embalagem descartável", category: "Mercado" },
-  { id: "m4", name: "Guardanapo", category: "Mercado" },
-  { id: "m5", name: "Sacola plástica", category: "Mercado" },
-];
+  function uid() { return Math.random().toString(36).slice(2, 9); }
 
-const STORAGE_KEY = "chicken-point-data";
-const OVERDUE_MS = 20 * 60 * 60 * 1000;
-const CHECK_INTERVAL_MS = 30 * 60 * 1000;
-const CAT_ICON = { Frangos: "🐔", Porções: "🍟", Bebidas: "🥤", Mercado: "🧂" };
-
-function uid() {
-  return Math.random().toString(36).slice(2, 9);
-}
-function timeAgoLabel(ts) {
-  const diff = Date.now() - ts;
-  const h = Math.floor(diff / 3600000);
-  if (h < 1) return "adicionado agora";
-  if (h < 24) return `há ${h}h na lista`;
-  return `há ${Math.floor(h / 24)}d na lista`;
-}
-function loadFromStorage() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    return null;
+  function esc(str) {
+    var d = document.createElement("div");
+    d.textContent = String(str);
+    return d.innerHTML;
   }
-}
-function saveToStorage(data) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (e) {
-    console.error("Falha ao salvar dados", e);
+
+  function timeAgoLabel(ts) {
+    var diff = Date.now() - ts;
+    var h = Math.floor(diff / 3600000);
+    if (h < 1) return "adicionado agora";
+    if (h < 24) return "há " + h + "h na lista";
+    return "há " + Math.floor(h / 24) + "d na lista";
   }
-}
 
-function ChickenPointApp() {
-  const initial = loadFromStorage();
-  const [catalog, setCatalog] = useState(initial?.catalog || DEFAULT_CATALOG);
-  const [active, setActive] = useState(initial?.active || {});
-  const [tab, setTab] = useState("Frangos");
-  const [editMode, setEditMode] = useState(false);
-  const [newItemName, setNewItemName] = useState("");
-  const [newItemCat, setNewItemCat] = useState("Frangos");
-  const [qtyDraft, setQtyDraft] = useState({});
-  const [notifPermission, setNotifPermission] = useState(
-    typeof Notification !== "undefined" ? Notification.permission : "unsupported"
-  );
-  const [showTicket, setShowTicket] = useState(true);
-  const notifiedRef = useRef({});
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        return {
+          catalog: parsed.catalog || DEFAULT_CATALOG.slice(),
+          active: parsed.active || {}
+        };
+      }
+    } catch (e) { /* primeira vez usando o app */ }
+    return { catalog: DEFAULT_CATALOG.slice(), active: {} };
+  }
 
-  useEffect(() => {
-    saveToStorage({ catalog, active });
-  }, [catalog, active]);
+  var saved = loadState();
 
-  const pendingEntries = Object.entries(active)
-    .filter(([, v]) => v.qty > 0)
-    .map(([id, v]) => ({ ...v, item: catalog.find((c) => c.id === id) }))
-    .filter((e) => e.item);
-
-  const overdue = pendingEntries.filter((e) => Date.now() - e.addedAt > OVERDUE_MS);
-
-  useEffect(() => {
-    if (notifPermission !== "granted") return;
-    const interval = setInterval(() => {
-      overdue.forEach((e) => {
-        if (notifiedRef.current[e.item.id]) return;
-        try {
-          new Notification("Chicken Point", {
-            body: `Lucas, você esqueceu de comprar ${e.item.name.toLowerCase()}.`,
-            icon: "icon-192.png",
-          });
-          notifiedRef.current[e.item.id] = true;
-        } catch (err) {}
-      });
-    }, CHECK_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [notifPermission, overdue]);
-
-  const requestNotif = async () => {
-    if (typeof Notification === "undefined") return;
-    const perm = await Notification.requestPermission();
-    setNotifPermission(perm);
+  var state = {
+    catalog: saved.catalog,
+    active: saved.active,
+    tab: "Frangos",
+    editMode: false,
+    newItemName: "",
+    newItemCat: "Frangos",
+    qtyDraft: {},
+    notifPermission: (typeof Notification !== "undefined") ? Notification.permission : "unsupported",
+    showTicket: true
   };
 
-  const setQty = (id, qty) => {
-    setActive((prev) => {
-      const next = { ...prev };
-      if (!qty || qty <= 0) delete next[id];
-      else next[id] = { qty, addedAt: prev[id]?.addedAt || Date.now() };
-      return next;
+  var notified = {};
+
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ catalog: state.catalog, active: state.active }));
+    } catch (e) { console.error("Falha ao salvar dados", e); }
+  }
+
+  function getPendingEntries() {
+    var out = [];
+    Object.keys(state.active).forEach(function (id) {
+      var v = state.active[id];
+      if (v.qty > 0) {
+        var item = state.catalog.filter(function (c) { return c.id === id; })[0];
+        if (item) out.push({ qty: v.qty, addedAt: v.addedAt, item: item });
+      }
     });
-  };
-  const markBought = (id) => {
-    setActive((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-    delete notifiedRef.current[id];
-  };
-  const addCatalogItem = () => {
-    const name = newItemName.trim();
+    return out;
+  }
+
+  function getOverdue(pending) {
+    return pending.filter(function (e) { return Date.now() - e.addedAt > OVERDUE_MS; });
+  }
+
+  function setQty(id, qty) {
+    if (!qty || qty <= 0) {
+      delete state.active[id];
+    } else {
+      var prevEntry = state.active[id];
+      state.active[id] = { qty: qty, addedAt: (prevEntry && prevEntry.addedAt) || Date.now() };
+    }
+    persist();
+    render();
+  }
+
+  function markBought(id) {
+    delete state.active[id];
+    delete notified[id];
+    persist();
+    render();
+  }
+
+  function addCatalogItem() {
+    var name = (state.newItemName || "").trim();
     if (!name) return;
-    setCatalog((prev) => [...prev, { id: uid(), name, category: newItemCat }]);
-    setNewItemName("");
-  };
-  const removeCatalogItem = (id) => {
-    setCatalog((prev) => prev.filter((c) => c.id !== id));
-    setActive((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
+    state.catalog.push({ id: uid(), name: name, category: state.newItemCat });
+    state.newItemName = "";
+    persist();
+    render();
+  }
+
+  function removeCatalogItem(id) {
+    state.catalog = state.catalog.filter(function (c) { return c.id !== id; });
+    delete state.active[id];
+    persist();
+    render();
+  }
+
+  function renameCatalogItem(id, name) {
+    state.catalog = state.catalog.map(function (c) { return c.id === id ? Object.assign({}, c, { name: name }) : c; });
+    persist();
+  }
+
+  function requestNotif() {
+    if (typeof Notification === "undefined") return;
+    Notification.requestPermission().then(function (perm) {
+      state.notifPermission = perm;
+      render();
     });
-  };
-  const renameCatalogItem = (id, name) => {
-    setCatalog((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)));
-  };
+  }
 
-  const itemsInTab = catalog.filter((c) => c.category === tab);
+  setInterval(function () {
+    if (state.notifPermission !== "granted") return;
+    var overdue = getOverdue(getPendingEntries());
+    overdue.forEach(function (e) {
+      if (notified[e.item.id]) return;
+      try {
+        new Notification("Chicken Point", {
+          body: "Lucas, você esqueceu de comprar " + e.item.name.toLowerCase() + ".",
+          icon: "icon-192.png"
+        });
+        notified[e.item.id] = true;
+      } catch (err) { /* ignore */ }
+    });
+  }, CHECK_INTERVAL_MS);
 
-  return (
-    <div style={styles.page}>
-      <div style={styles.shell}>
-        <header style={styles.header}>
-          <div>
-            <div style={styles.eyebrow}>REPOSIÇÃO DE ESTOQUE</div>
-            <h1 style={styles.title}>CHICKEN POINT</h1>
-          </div>
-          <button
-            aria-label={notifPermission === "granted" ? "Lembretes ativos" : "Ativar lembretes"}
-            onClick={requestNotif}
-            style={{ ...styles.bellBtn, background: notifPermission === "granted" ? "#E3A62F" : "#2C251B" }}
-            title={notifPermission === "granted" ? "Lembretes ativos" : "Ativar lembretes no navegador"}
-          >
-            <span style={{ fontSize: 18 }}>{notifPermission === "granted" ? "🔔" : "🔕"}</span>
-          </button>
-        </header>
+  function rowHtml(item) {
+    var isActive = !!state.active[item.id];
+    var draft = state.qtyDraft[item.id];
 
-        {pendingEntries.length > 0 && (
-          <div style={styles.ticketWrap}>
-            <button onClick={() => setShowTicket((s) => !s)} style={styles.ticketHeader}>
-              <span style={styles.ticketHeaderLeft}>
-                <span style={styles.ticketDot(overdue.length > 0)} />
-                COMANDA — {pendingEntries.length} PENDENTE{pendingEntries.length > 1 ? "S" : ""}
-                {overdue.length > 0 ? ` · ${overdue.length} ATRASADO${overdue.length > 1 ? "S" : ""}` : ""}
-              </span>
-              <span style={{ color: "#B5A990", transform: showTicket ? "rotate(90deg)" : "none", transition: "transform .15s", display: "inline-block" }}>›</span>
-            </button>
-            {showTicket && (
-              <div style={styles.ticketBody}>
-                {overdue.length > 0 && (
-                  <div style={styles.reminderMsg}>
-                    Lucas, você esqueceu de comprar {overdue[0].item.name.toLowerCase()}
-                    {overdue.length > 1 ? ` (+${overdue.length - 1} item${overdue.length > 2 ? "s" : ""})` : ""}.
-                  </div>
-                )}
-                {pendingEntries.map((e) => (
-                  <div key={e.item.id} style={styles.ticketRow}>
-                    <span style={styles.ticketQty}>{e.qty}×</span>
-                    <span style={styles.ticketName}>{e.item.name}</span>
-                    <span style={styles.ticketMeta}>{timeAgoLabel(e.addedAt)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+    if (state.editMode) {
+      return (
+        '<div class="cp-row" data-row="' + item.id + '">' +
+          '<input class="cp-edit-input" data-rename="' + item.id + '" value="' + esc(item.name) + '" />' +
+          '<button class="cp-danger-btn" data-action="remove" data-id="' + item.id + '" aria-label="Remover">🗑</button>' +
+        '</div>'
+      );
+    }
+    if (isActive) {
+      var qty = state.active[item.id].qty;
+      return (
+        '<div class="cp-row">' +
+          '<div class="cp-row-name">' + esc(item.name) + '</div>' +
+          '<div class="cp-stepper">' +
+            '<button class="cp-step-btn" data-action="dec" data-id="' + item.id + '" aria-label="Diminuir">−</button>' +
+            '<span class="cp-step-qty">' + qty + '</span>' +
+            '<button class="cp-step-btn" data-action="inc" data-id="' + item.id + '" aria-label="Aumentar">+</button>' +
+          '</div>' +
+          '<button class="cp-bought-btn" data-action="bought" data-id="' + item.id + '" aria-label="Marcar como comprado">✓</button>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="cp-row">' +
+        '<div class="cp-row-name">' + esc(item.name) + '</div>' +
+        '<input class="cp-qty-input" data-qtydraft="' + item.id + '" inputmode="numeric" pattern="[0-9]*" placeholder="qtd" value="' + esc(draft || "") + '" />' +
+        '<button class="cp-add-btn" data-action="add" data-id="' + item.id + '" aria-label="Adicionar">+</button>' +
+      '</div>'
+    );
+  }
 
-        <div style={styles.tabRow} className="cp-scroll">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setTab(cat)}
-              style={{
-                ...styles.tabBtn,
-                background: tab === cat ? "#E3A62F" : "transparent",
-                color: tab === cat ? "#17140F" : "#B5A990",
-                borderColor: tab === cat ? "#E3A62F" : "#3A3226",
-              }}
-            >
-              <span style={{ marginRight: 6 }}>{CAT_ICON[cat]}</span>
-              {cat}
-            </button>
-          ))}
-        </div>
+  function render() {
+    var pending = getPendingEntries();
+    var overdue = getOverdue(pending);
+    var itemsInTab = state.catalog.filter(function (c) { return c.category === state.tab; });
 
-        <main style={styles.list}>
-          {itemsInTab.length === 0 && (
-            <div style={styles.empty}>
-              Nenhum item cadastrado em {tab} ainda. Toque em "Editar catálogo" para adicionar.
-            </div>
-          )}
+    var ticketHtml = "";
+    if (pending.length > 0) {
+      ticketHtml =
+        '<div class="cp-ticket">' +
+          '<button class="cp-ticket-header" data-action="toggle-ticket">' +
+            '<span class="cp-ticket-left">' +
+              '<span class="cp-dot' + (overdue.length > 0 ? ' overdue' : '') + '"></span>' +
+              'COMANDA — ' + pending.length + ' PENDENTE' + (pending.length > 1 ? 'S' : '') +
+              (overdue.length > 0 ? ' · ' + overdue.length + ' ATRASADO' + (overdue.length > 1 ? 'S' : '') : '') +
+            '</span>' +
+            '<span style="color:#B5A990;">' + (state.showTicket ? '▾' : '▸') + '</span>' +
+          '</button>' +
+          (state.showTicket ?
+            '<div class="cp-ticket-body">' +
+              (overdue.length > 0 ?
+                '<div class="cp-reminder">Lucas, você esqueceu de comprar ' + esc(overdue[0].item.name.toLowerCase()) +
+                (overdue.length > 1 ? ' (+' + (overdue.length - 1) + ' item' + (overdue.length > 2 ? 's' : '') + ')' : '') + '.</div>'
+                : '') +
+              pending.map(function (e) {
+                return '<div class="cp-ticket-row"><span class="cp-ticket-qty">' + e.qty + '×</span><span class="cp-ticket-name">' + esc(e.item.name) + '</span><span class="cp-ticket-meta">' + timeAgoLabel(e.addedAt) + '</span></div>';
+              }).join("") +
+            '</div>'
+            : '') +
+        '</div>';
+    }
 
-          {itemsInTab.map((item) => {
-            const isActive = !!active[item.id];
-            const draft = qtyDraft[item.id];
-            return (
-              <div key={item.id} style={styles.row}>
-                {editMode ? (
-                  <>
-                    <input value={item.name} onChange={(e) => renameCatalogItem(item.id, e.target.value)} style={styles.editInput} />
-                    <button onClick={() => removeCatalogItem(item.id)} style={styles.iconBtnDanger} aria-label={`Remover ${item.name}`}>🗑</button>
-                  </>
-                ) : isActive ? (
-                  <>
-                    <div style={styles.rowName}>{item.name}</div>
-                    <div style={styles.stepper}>
-                      <button onClick={() => setQty(item.id, active[item.id].qty - 1)} style={styles.stepBtn} aria-label="Diminuir quantidade">−</button>
-                      <span style={styles.stepQty}>{active[item.id].qty}</span>
-                      <button onClick={() => setQty(item.id, active[item.id].qty + 1)} style={styles.stepBtn} aria-label="Aumentar quantidade">+</button>
-                    </div>
-                    <button onClick={() => markBought(item.id)} style={styles.boughtBtn} aria-label={`Marcar ${item.name} como comprado`} title="Marcar como comprado">✓</button>
-                  </>
-                ) : (
-                  <>
-                    <div style={styles.rowName}>{item.name}</div>
-                    <input
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      placeholder="qtd"
-                      value={draft ?? ""}
-                      onChange={(e) => {
-                        const v = e.target.value.replace(/[^0-9]/g, "");
-                        setQtyDraft((prev) => ({ ...prev, [item.id]: v }));
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && draft) {
-                          setQty(item.id, parseInt(draft, 10));
-                          setQtyDraft((prev) => ({ ...prev, [item.id]: "" }));
-                        }
-                      }}
-                      style={styles.qtyInput}
-                    />
-                    <button
-                      onClick={() => {
-                        if (draft) {
-                          setQty(item.id, parseInt(draft, 10));
-                          setQtyDraft((prev) => ({ ...prev, [item.id]: "" }));
-                        }
-                      }}
-                      style={styles.addBtn}
-                      aria-label={`Adicionar ${item.name} à lista`}
-                    >+</button>
-                  </>
-                )}
-              </div>
-            );
-          })}
+    var tabsHtml = CATEGORIES.map(function (cat) {
+      return '<button class="cp-tab' + (state.tab === cat ? ' active' : '') + '" data-action="tab" data-cat="' + cat + '"><span style="margin-right:6px;">' + CAT_ICON[cat] + '</span>' + cat + '</button>';
+    }).join("");
 
-          {editMode && (
-            <div style={styles.newItemRow}>
-              <select value={newItemCat} onChange={(e) => setNewItemCat(e.target.value)} style={styles.select}>
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{CAT_ICON[c]} {c}</option>
-                ))}
-              </select>
-              <input
-                value={newItemName}
-                onChange={(e) => setNewItemName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && addCatalogItem()}
-                placeholder="Novo item do catálogo"
-                style={styles.editInput}
-              />
-              <button onClick={addCatalogItem} style={styles.addBtn} aria-label="Adicionar item ao catálogo">+</button>
-            </div>
-          )}
-        </main>
+    var listHtml = itemsInTab.length === 0
+      ? '<div class="cp-empty">Nenhum item cadastrado em ' + esc(state.tab) + ' ainda. Toque em "Editar catálogo" para adicionar.</div>'
+      : itemsInTab.map(rowHtml).join("");
 
-        <footer style={styles.footer}>
-          <button
-            onClick={() => setEditMode((s) => !s)}
-            style={{ ...styles.editToggle, background: editMode ? "#C1440E" : "#2C251B", color: editMode ? "#F5EFE3" : "#B5A990" }}
-          >
-            {editMode ? "✕ Concluir edição" : "✎ Editar catálogo"}
-          </button>
-        </footer>
-      </div>
-    </div>
-  );
-}
+    var newItemRowHtml = state.editMode
+      ? '<div class="cp-new-row">' +
+          '<select class="cp-select" id="cp-new-cat">' +
+            CATEGORIES.map(function (c) {
+              return '<option value="' + c + '"' + (state.newItemCat === c ? ' selected' : '') + '>' + CAT_ICON[c] + ' ' + c + '</option>';
+            }).join("") +
+          '</select>' +
+          '<input class="cp-edit-input" id="cp-new-name" placeholder="Novo item do catálogo" value="' + esc(state.newItemName) + '" />' +
+          '<button class="cp-add-btn" data-action="add-catalog" aria-label="Adicionar item ao catálogo">+</button>' +
+        '</div>'
+      : '';
 
-const styles = {
-  page: { minHeight: "100vh", background: "#17140F", display: "flex", justifyContent: "center", fontFamily: "'Inter', sans-serif", padding: "0 0 24px" },
-  shell: { width: "100%", maxWidth: 480, minHeight: "100vh", background: "#1C1811", display: "flex", flexDirection: "column" },
-  header: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 20px 16px", borderBottom: "1px solid #2C251B" },
-  eyebrow: { fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, letterSpacing: "0.14em", color: "#C1440E", fontWeight: 600, marginBottom: 2 },
-  title: { fontFamily: "'Bebas Neue', sans-serif", fontSize: 34, letterSpacing: "0.04em", color: "#F5EFE3", margin: 0, lineHeight: 1 },
-  bellBtn: { width: 40, height: 40, borderRadius: 10, border: "1px solid #3A3226", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  ticketWrap: { margin: "16px 20px 0", background: "#221D16", border: "1px solid #3A3226", borderRadius: 12, overflow: "hidden" },
-  ticketHeader: { width: "100%", background: "transparent", border: "none", padding: "12px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", color: "#F5EFE3" },
-  ticketHeaderLeft: { fontFamily: "'IBM Plex Mono', monospace", fontSize: 12, letterSpacing: "0.04em", display: "flex", alignItems: "center", gap: 8, color: "#F5EFE3" },
-  ticketDot: (o) => ({ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: o ? "#C1440E" : "#E3A62F" }),
-  ticketBody: { borderTop: "1px dashed #3A3226", padding: "10px 14px 14px" },
-  reminderMsg: { fontFamily: "'IBM Plex Mono', monospace", fontSize: 12.5, color: "#E3A62F", background: "#2C251B", border: "1px solid #3A3226", borderRadius: 8, padding: "8px 10px", marginBottom: 10 },
-  ticketRow: { display: "flex", alignItems: "baseline", gap: 8, fontFamily: "'IBM Plex Mono', monospace", fontSize: 13, color: "#D8CDB8", padding: "4px 0" },
-  ticketQty: { color: "#E3A62F", fontWeight: 600, minWidth: 26 },
-  ticketName: { flex: 1 },
-  ticketMeta: { color: "#7A6E58", fontSize: 11 },
-  tabRow: { display: "flex", gap: 8, padding: "16px 20px 4px", overflowX: "auto" },
-  tabBtn: { flexShrink: 0, padding: "8px 14px", borderRadius: 999, border: "1px solid", fontSize: 13.5, fontWeight: 600, whiteSpace: "nowrap" },
-  list: { flex: 1, padding: "8px 20px 12px", display: "flex", flexDirection: "column", gap: 8 },
-  empty: { color: "#7A6E58", fontSize: 13.5, padding: "24px 4px", lineHeight: 1.5 },
-  row: { display: "flex", alignItems: "center", gap: 10, background: "#221D16", border: "1px solid #2C251B", borderRadius: 10, padding: "10px 12px", minHeight: 52 },
-  rowName: { flex: 1, color: "#F5EFE3", fontSize: 14.5, fontWeight: 500 },
-  qtyInput: { width: 52, background: "#17140F", border: "1px solid #3A3226", borderRadius: 8, color: "#F5EFE3", fontFamily: "'IBM Plex Mono', monospace", fontSize: 14, padding: "8px 6px", textAlign: "center" },
-  addBtn: { width: 34, height: 34, borderRadius: 8, background: "#E3A62F", border: "none", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 16, color: "#17140F", fontWeight: 700 },
-  boughtBtn: { width: 34, height: 34, borderRadius: 8, background: "#6B8F47", border: "none", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 15, color: "#17140F", fontWeight: 700 },
-  stepper: { display: "flex", alignItems: "center", gap: 8, background: "#17140F", border: "1px solid #3A3226", borderRadius: 8, padding: "4px 8px" },
-  stepBtn: { background: "transparent", border: "none", color: "#E3A62F", display: "flex", alignItems: "center", justifyContent: "center", padding: 4, fontSize: 16, fontWeight: 700 },
-  stepQty: { fontFamily: "'IBM Plex Mono', monospace", color: "#F5EFE3", fontSize: 14, minWidth: 18, textAlign: "center" },
-  editInput: { flex: 1, background: "#17140F", border: "1px solid #3A3226", borderRadius: 8, color: "#F5EFE3", fontSize: 14, padding: "8px 10px" },
-  iconBtnDanger: { width: 34, height: 34, borderRadius: 8, background: "#3A2018", border: "1px solid #C1440E55", color: "#C1440E", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 14 },
-  newItemRow: { display: "flex", alignItems: "center", gap: 8, background: "#1C1811", border: "1px dashed #3A3226", borderRadius: 10, padding: "10px 12px", marginTop: 4 },
-  select: { background: "#17140F", border: "1px solid #3A3226", borderRadius: 8, color: "#F5EFE3", fontSize: 13, padding: "8px 6px", flexShrink: 0, maxWidth: 108 },
-  footer: { padding: "8px 20px 20px" },
-  editToggle: { width: "100%", border: "none", borderRadius: 10, padding: "13px 0", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 },
-};
+    document.getElementById("root").innerHTML =
+      '<div class="cp-page"><div class="cp-shell">' +
+        '<header class="cp-header">' +
+          '<div>' +
+            '<div class="cp-eyebrow">REPOSIÇÃO DE ESTOQUE</div>' +
+            '<h1 class="cp-title">CHICKEN POINT</h1>' +
+          '</div>' +
+          '<button class="cp-bell' + (state.notifPermission === "granted" ? ' on' : '') + '" data-action="notif" aria-label="Lembretes">' +
+            (state.notifPermission === "granted" ? '🔔' : '🔕') +
+          '</button>' +
+        '</header>' +
+        ticketHtml +
+        '<div class="cp-tabrow cp-scroll">' + tabsHtml + '</div>' +
+        '<main class="cp-list">' + listHtml + newItemRowHtml + '</main>' +
+        '<footer class="cp-footer">' +
+          '<button class="cp-edit-toggle' + (state.editMode ? ' active' : '') + '" data-action="toggle-edit">' +
+            (state.editMode ? '✕ Concluir edição' : '✎ Editar catálogo') +
+          '</button>' +
+        '</footer>' +
+      '</div></div>';
 
-ReactDOM.createRoot(document.getElementById("root")).render(<ChickenPointApp />);
+    attachEvents();
+  }
+
+  function attachEvents() {
+    var root = document.getElementById("root");
+
+    root.querySelectorAll("[data-action]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var action = el.getAttribute("data-action");
+        var id = el.getAttribute("data-id");
+        if (action === "notif") requestNotif();
+        else if (action === "toggle-ticket") { state.showTicket = !state.showTicket; render(); }
+        else if (action === "tab") { state.tab = el.getAttribute("data-cat"); render(); }
+        else if (action === "toggle-edit") { state.editMode = !state.editMode; render(); }
+        else if (action === "remove") removeCatalogItem(id);
+        else if (action === "dec") setQty(id, state.active[id].qty - 1);
+        else if (action === "inc") setQty(id, state.active[id].qty + 1);
+        else if (action === "bought") markBought(id);
+        else if (action === "add") {
+          var draft = state.qtyDraft[id];
+          if (draft) { setQty(id, parseInt(draft, 10)); state.qtyDraft[id] = ""; }
+        } else if (action === "add-catalog") {
+          var nameEl = document.getElementById("cp-new-name");
+          var catEl = document.getElementById("cp-new-cat");
+          state.newItemName = nameEl ? nameEl.value : state.newItemName;
+          state.newItemCat = catEl ? catEl.value : state.newItemCat;
+          addCatalogItem();
+        }
+      });
+    });
+
+    root.querySelectorAll("[data-rename]").forEach(function (el) {
+      el.addEventListener("input", function () {
+        renameCatalogItem(el.getAttribute("data-rename"), el.value);
+      });
+    });
+
+    root.querySelectorAll("[data-qtydraft]").forEach(function (el) {
+      var id = el.getAttribute("data-qtydraft");
+      el.addEventListener("input", function () {
+        var v = el.value.replace(/[^0-9]/g, "");
+        state.qtyDraft[id] = v;
+        el.value = v;
+      });
+      el.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" && state.qtyDraft[id]) {
+          setQty(id, parseInt(state.qtyDraft[id], 10));
+          state.qtyDraft[id] = "";
+        }
+      });
+    });
+
+    var newNameEl = document.getElementById("cp-new-name");
+    if (newNameEl) {
+      newNameEl.addEventListener("input", function () { state.newItemName = newNameEl.value; });
+      newNameEl.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter") {
+          var catEl = document.getElementById("cp-new-cat");
+          state.newItemCat = catEl ? catEl.value : state.newItemCat;
+          addCatalogItem();
+        }
+      });
+    }
+    var newCatEl = document.getElementById("cp-new-cat");
+    if (newCatEl) {
+      newCatEl.addEventListener("change", function () { state.newItemCat = newCatEl.value; });
+    }
+  }
+
+  render();
+})();
 </script>
 
 <script>
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(() => {});
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
     });
   }
 </script>
 </body>
 </html>
+
+
